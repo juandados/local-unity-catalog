@@ -1,0 +1,76 @@
+name: unitycatalog
+
+services:
+  delta:
+    build:
+      context: delta
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - type: bind
+        source: unitycatalog/etc/conf
+        target: /opt/delta/etc/conf
+      - type: volume
+        source: unitycatalog
+        target: /home/unitycatalog
+    command: tail -f /dev/null
+    
+  server:
+    build:
+      context: unitycatalog
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - type: bind
+        source: unitycatalog/etc/conf
+        target: /opt/unitycatalog/etc/conf
+      - type: volume
+        source: unitycatalog
+        target: /home/unitycatalog
+  ui:
+    build:
+      context: unitycatalog/ui/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    #   interval: 30s
+    #   timeout: 20s
+    #   retries: 3
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest
+    container_name: mlflow
+    ports:
+      - "5000:5000"
+    environment:
+      MLFLOW_TRACKING_URI: http://0.0.0.0:5000
+      MLFLOW_BACKEND_STORE_URI: /mlflow/mlruns
+      MLFLOW_ARTIFACT_ROOT: /mlflow/mlruns
+    volumes:
+      - mlflow_data:/mlflow/mlruns
+    command: mlflow server --backend-store-uri /mlflow/mlruns --default-artifact-root /mlflow/mlruns --host 0.0.0.0
+
+volumes:
+  # Persist docker volume across container restarts
+  unitycatalog:
+  minio_data:
+  mlflow_data:
