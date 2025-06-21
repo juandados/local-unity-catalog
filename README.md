@@ -1,3 +1,39 @@
+# Local Unity Catalog with Delta Lake
+
+This project demonstrates how to use Unity Catalog locally with Delta Lake and PySpark, running in Docker containers.
+
+## Prerequisites
+
+- Docker and Docker Compose
+- Git
+
+## Setup and Running
+
+1. **Clone the required repositories:**
+   ```sh
+   # Clone the forked Delta Lake repository
+   git clone https://github.com/juandados/delta.git
+   
+   # Clone the forked Unity Catalog repository  
+   git clone https://github.com/juandados/unitycatalog.git
+   ```
+
+2. **Start the services:**
+   ```sh
+   docker compose up -d
+   ```
+
+3. **Access the Spark container:**
+   ```sh
+   docker exec -it <spark-container-name> bash
+   ```
+
+4. **Run PySpark commands inside the container** using the examples below.
+
+---
+
+# PySpark Examples
+
 # Start a new spark session
 ```sh
 pyspark --name "local-uc-test" \
@@ -233,5 +269,3 @@ INSERT INTO unity.default.external_customers VALUES
 (5, 'David', 'Brown')
 """)
 ```
-
-##
