@@ -1,9 +1,9 @@
 name: unitycatalog
 
 services:
-  spark_oic:
+  pyspark:
     build:
-      context: spark_oic
+      context: pyspark
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
@@ -15,8 +15,9 @@ services:
       - type: volume
         source: unitycatalog
         target: /home/unitycatalog
+    networks:
+      - lakehouse_net
     command: tail -f /dev/null
-    
   server:
     build:
       context: unitycatalog
@@ -30,6 +31,9 @@ services:
       - type: volume
         source: unitycatalog
         target: /home/unitycatalog
+    networks:
+      - lakehouse_net
+  
   ui:
     build:
       context: unitycatalog/ui/
@@ -38,6 +42,8 @@ services:
       - "3000:3000"
     depends_on:
       - server
+    networks:
+      - lakehouse_net
 
   mlflow:
     image: ghcr.io/mlflow/mlflow:latest
@@ -50,9 +56,15 @@ services:
       MLFLOW_ARTIFACT_ROOT: /mlflow/mlruns
     volumes:
       - mlflow_data:/mlflow/mlruns
+    networks:
+      - lakehouse_net
     command: mlflow server --backend-store-uri /mlflow/mlruns --default-artifact-root /mlflow/mlruns --host 0.0.0.0
 
 volumes:
   # Persist docker volume across container restarts
   unitycatalog:
   mlflow_data:
+
+networks:
+  lakehouse_net:
+    external: true

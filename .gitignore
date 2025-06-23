@@ -176,6 +176,7 @@ notebooks/
 
 # Other repositories
 delta/
+unitycatalog/
 
 # GitHub copilot
 .github/copilot/
