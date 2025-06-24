@@ -33,6 +33,7 @@ This project demonstrates how to use Unity Catalog locally with Delta Lake and P
 ---
 
 # PySpark Examples
+**Note** You should have spark 3.5.3 or above to support unitycatalog features.
 
 # Start a new spark session
 ```sh
@@ -48,8 +49,10 @@ pyspark --name "local-uc-test" \
     --conf "spark.sql.catalog.my_catalog.uri=http://server:8080" \
     --conf "spark.sql.catalog.my_catalog.token=" \
     --conf "spark.sql.defaultCatalog=unity" \
-    --conf "spark.databricks.delta.catalog.update.enabled=true" #needed to write the columns in unity
+    --conf "spark.databricks.delta.catalog.update.enabled=true"
 ```
+
+**Note:** Replace `server` by `localhost` when working with the delta container within the client compose.
 
 ## List schemas in catalog unity
 
@@ -88,53 +91,35 @@ spark.sql("SELECT * FROM unity.default.numbers").show()
 ## Create a new table called employees in unity.default
 
 ```python
+# Drop the employees table if it exists
+spark.sql("DROP TABLE IF EXISTS unity.default.employees")
+```
+
+## Create a new table called employees in unity.default
+
+```python
 # Create a new employees table in unity.default
 spark.sql("""
-CREATE TABLE unity.default.employees1 (
-    employee_id INT COMMENT 'Unique identifier for each employee',
-    first_name STRING COMMENT 'Employee first name',
-    last_name STRING COMMENT 'Employee last name',
-    email STRING COMMENT 'Employee email address',
-    department STRING COMMENT 'Department where employee works',
-    hire_date TIMESTAMP COMMENT 'Date when employee was hired',
-    salary DOUBLE COMMENT 'Employee annual salary in USD'
+CREATE TABLE unity.default.employees2 (
+  employee_id INT COMMENT 'Unique identifier for each employee',
+  first_name STRING COMMENT 'Employee first name',
+  last_name STRING COMMENT 'Employee last name',
+  email STRING COMMENT 'Employee email address',
+  department STRING COMMENT 'Department where employee works',
+  hire_date TIMESTAMP COMMENT 'Date when employee was hired',
+  salary DOUBLE COMMENT 'Employee annual salary in USD'
 ) USING DELTA
-LOCATION '/home/unitycatalog/etc/data/external/unity/default/tables/employees1'
+LOCATION '/home/unitycatalog/etc/data/external/unity/default/tables/employees2'
 """)
 ```
-## Write employees table to MinIO S3 path
+**Note:** There is the chance you need to chante the permisions of the unity table. `docker exec -u root -it unitycatalog-server-1 chmod -R 777 /home/unitycatalog/etc/data/external/unity/default/tables/`
 
-```python
-# Write the employees table to a MinIO S3 path
-spark.sql("""
-CREATE TABLE unity.default.employees_backup
-USING DELTA
-LOCATION 's3a://bk1/employees_backup'
-AS SELECT * FROM unity.default.employees
-""")
-```
-
-## Write DataFrame to MinIO S3 as Parquet
-
-```python
-# Read table and write to MinIO as Parquet
-df = spark.table("unity.default.employees")
-df.write.mode("overwrite").parquet("s3a://warehouse/unity/default/exports/employees_parquet")
-```
-
-## Write DataFrame to MinIO S3 as Delta
-
-```python
-# Read table and write to MinIO as Delta format
-df = spark.table("unity.default.employees")
-df.write.format("delta").mode("overwrite").save("s3a://warehouse/unity/default/exports/employees_delta")
-```
 ## Insert sample data into unity.default.employees
 
 ```python
 # Insert mock employee data
 spark.sql("""
-INSERT INTO unity.default.employees1 VALUES
+INSERT INTO unity.default.employees2 VALUES
 (1, 'John', 'Doe', 'john.doe@company.com', 'Engineering', '2023-01-15', 75000.00),
 (2, 'Jane', 'Smith', 'jane.smith@company.com', 'Marketing', '2023-02-20', 68000.00),
 (3, 'Mike', 'Johnson', 'mike.johnson@company.com', 'Sales', '2023-03-10', 72000.00),
@@ -158,19 +143,21 @@ pyspark --name "local-uc-test" \
     --conf "spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension" \
     --conf "spark.sql.catalog.spark_catalog=io.unitycatalog.spark.UCSingleCatalog" \
     --conf "spark.sql.catalog.unity=io.unitycatalog.spark.UCSingleCatalog" \
-    --conf "spark.sql.catalog.unity.uri=http://server:8080" \
+    --conf "spark.sql.catalog.unity.uri=http://localhost:8080" \
     --conf "spark.sql.catalog.unity.token=" \
     --conf "spark.sql.catalog.my_catalog=io.unitycatalog.spark.UCSingleCatalog" \
-    --conf "spark.sql.catalog.my_catalog.uri=http://server:8080" \
+    --conf "spark.sql.catalog.my_catalog.uri=http://localhost:8080" \
     --conf "spark.sql.catalog.my_catalog.token=" \
     --conf "spark.sql.defaultCatalog=unity" \
     --conf "spark.hadoop.fs.s3.impl=org.apache.hadoop.fs.s3a.S3AFileSystem" \
-    --conf "spark.hadoop.fs.s3a.endpoint=http://minio:9000" \
+    --conf "spark.hadoop.fs.s3a.endpoint=http://localhost:9000" \
     --conf "spark.hadoop.fs.s3a.access.key=minioadmin" \
     --conf "spark.hadoop.fs.s3a.secret.key=minioadmin" \
     --conf "spark.hadoop.fs.s3a.path.style.access=true" \
-    --conf "spark.hadoop.fs.s3a.connection.ssl.enabled=false"
+    --conf "spark.hadoop.fs.s3a.connection.ssl.enabled=false" \
+    --conf "spark.databricks.delta.catalog.update.enabled=true"
 ```
+
 ## Create external Delta table from CSV in MinIO S3
 
 ```python
@@ -268,4 +255,13 @@ INSERT INTO unity.default.external_customers VALUES
 (4, 'Sarah', 'Wilson'),
 (5, 'David', 'Brown')
 """)
+```
+
+
+## Write DataFrame to MinIO S3 as Delta
+
+```python
+# Read table and write to MinIO as Delta format
+df = spark.table("unity.default.employees")
+df.write.format("delta").mode("overwrite").save("s3a://warehouse/unity/default/exports/employees_delta")
 ```

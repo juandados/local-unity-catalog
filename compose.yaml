@@ -11,6 +11,9 @@ services:
       - type: bind
         source: unitycatalog/etc/conf
         target: /opt/delta/etc/conf
+      - type: bind
+        source: data_warehouse
+        target: /home/unitycatalog/etc/data/external
       - type: volume
         source: unitycatalog
         target: /home/unitycatalog
@@ -29,6 +32,9 @@ services:
       - type: volume
         source: unitycatalog
         target: /home/unitycatalog
+      - type: bind
+        source: data_warehouse
+        target: /home/unitycatalog/etc/data/external
   ui:
     build:
       context: unitycatalog/ui/
@@ -50,11 +56,6 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     command: server /data --console-address ":9001"
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-    #   interval: 30s
-    #   timeout: 20s
-    #   retries: 3
 
   mlflow:
     image: ghcr.io/mlflow/mlflow:latest
