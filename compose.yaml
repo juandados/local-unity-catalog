@@ -17,18 +17,20 @@ services:
         source: ${DATA_WAREHOUSE_PATH:-/home/andres-campos/github_private/local-unity-catalog/data_warehouse}
         target: /home/unitycatalog/etc/data/external
       - type: bind
-        source: ./setup
-        target: /tmp/setup
+        source: ./notebooks
+        target: /tmp/notebooks
+      - type: bind
+        source: ./README.md
+        target: /tmp/notebooks/README.md
     command: >
-      bash -c "cp -r /tmp/setup/* /home/unitycatalog/etc/data/external/ &&
       jupyter lab 
       --ip=0.0.0.0 
       --port=8888 
       --no-browser 
       --NotebookApp.token=''
       --NotebookApp.password=''
-      --notebook-dir=/home/unitycatalog/etc/data/external
-      --allow-root"
+      --notebook-dir=/tmp/notebooks
+      --allow-root
   server:
     build:
       context: unitycatalog

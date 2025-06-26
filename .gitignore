@@ -164,7 +164,9 @@ cython_debug/
 
 # Notebooks and notebook folder
 *.ipynb_checkpoints/
-notebooks/
+*.Trash-0
+notebooks/README.md
+notebooks/download
 
 # Configuration and trash files - Docker workspace
 # .devcontainer/
@@ -172,6 +174,7 @@ notebooks/
 .Trash-1000/
 .vscode/
 .virtual_documents/
+setup/
 
 # Other repositories
 delta/
