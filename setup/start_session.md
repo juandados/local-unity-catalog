@@ -6,31 +6,10 @@ This project enables working with Unity Catalog locally using PySpark and Delta 
 
 To initialize the Spark session properly with Unity Catalog:
 
-### 1️⃣ Clean up environment variables
+### 1️⃣ Create the Spark session
 
 ```python
-import os
-if "SPARK_REMOTE" in os.environ:
-    del os.environ["SPARK_REMOTE"]
-if "SPARK_LOCAL" in os.environ:
-    del os.environ["SPARK_LOCAL"]
-```
 
-## 2️⃣ Temporarily disable Databricks Connect validations
-
-```python
-try:
-    from pyspark.sql import SparkSession
-    if hasattr(SparkSession.Builder, "_validate_startup_urls"):
-        original_method = SparkSession.Builder._validate_startup_urls
-        SparkSession.Builder._validate_startup_urls = lambda self: None
-except Exception:
-    pass
-```
-
-## 3️⃣ Create the Spark session
-
-```python
 spark = SparkSession.builder \
     .appName("local-uc-test") \
     .master("local[*]") \
@@ -47,16 +26,6 @@ spark = SparkSession.builder \
     .config("spark.databricks.delta.catalog.update.enabled", "true") \
     .enableHiveSupport() \
     .getOrCreate()
-```
-
-## 4️⃣ Restore original method if it was modified
-
-```python
-try:
-    if "original_method" in locals():
-        SparkSession.Builder._validate_startup_urls = original_method
-except:
-    pass
 ```
 
 ## 🔍 Example Queries

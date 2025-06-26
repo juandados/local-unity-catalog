@@ -14,7 +14,7 @@ services:
         source: unitycatalog/etc/conf
         target: /opt/delta/etc/conf
       - type: bind
-        source: data_warehouse
+        source: ${DATA_WAREHOUSE_PATH:-/home/andres-campos/github_private/local-unity-catalog/data_warehouse}
         target: /home/unitycatalog/etc/data/external
       - type: bind
         source: ./setup
@@ -43,7 +43,7 @@ services:
         source: unitycatalog
         target: /home/unitycatalog
       - type: bind
-        source: data_warehouse
+        source: ${DATA_WAREHOUSE_PATH:-/home/andres-campos/github_private/local-unity-catalog/data_warehouse}
         target: /home/unitycatalog/etc/data/external
   
   ui:
