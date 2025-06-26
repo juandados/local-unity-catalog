@@ -8,16 +8,27 @@ services:
     ports:
       - "8000:8000"
       - "4040:4040"  # For SparkUI
+      - "8888:8888"  # For JupyterHub
     volumes:
       - type: bind
         source: unitycatalog/etc/conf
         target: /opt/delta/etc/conf
-      - type: volume
-        source: unitycatalog
-        target: /home/unitycatalog
-    networks:
-      - lakehouse_net
-    command: tail -f /dev/null
+      - type: bind
+        source: data_warehouse
+        target: /home/unitycatalog/etc/data/external
+      - type: bind
+        source: ./setup
+        target: /tmp/setup
+    command: >
+      bash -c "cp -r /tmp/setup/* /home/unitycatalog/etc/data/external/ &&
+      jupyter lab 
+      --ip=0.0.0.0 
+      --port=8888 
+      --no-browser 
+      --NotebookApp.token=''
+      --NotebookApp.password=''
+      --notebook-dir=/home/unitycatalog/etc/data/external
+      --allow-root"
   server:
     build:
       context: unitycatalog
@@ -31,8 +42,9 @@ services:
       - type: volume
         source: unitycatalog
         target: /home/unitycatalog
-    networks:
-      - lakehouse_net
+      - type: bind
+        source: data_warehouse
+        target: /home/unitycatalog/etc/data/external
   
   ui:
     build:
@@ -42,8 +54,6 @@ services:
       - "3000:3000"
     depends_on:
       - server
-    networks:
-      - lakehouse_net
 
   mlflow:
     image: ghcr.io/mlflow/mlflow:latest
@@ -56,15 +66,9 @@ services:
       MLFLOW_ARTIFACT_ROOT: /mlflow/mlruns
     volumes:
       - mlflow_data:/mlflow/mlruns
-    networks:
-      - lakehouse_net
     command: mlflow server --backend-store-uri /mlflow/mlruns --default-artifact-root /mlflow/mlruns --host 0.0.0.0
 
 volumes:
   # Persist docker volume across container restarts
   unitycatalog:
   mlflow_data:
-
-networks:
-  lakehouse_net:
-    external: true

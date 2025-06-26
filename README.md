@@ -34,6 +34,7 @@ This project demonstrates how to use Unity Catalog locally with Delta Lake and P
 ---
 
 # PySpark Examples
+**Note** You should have spark 3.5.3 or above to support unitycatalog features.
 
 ## Start a new spark session
 ```sh
@@ -49,8 +50,10 @@ pyspark --name "local-uc-test" \
     --conf "spark.sql.catalog.my_catalog.uri=http://server:8080" \
     --conf "spark.sql.catalog.my_catalog.token=" \
     --conf "spark.sql.defaultCatalog=unity" \
-    --conf "spark.databricks.delta.catalog.update.enabled=true" # needed to write the columns in unity
+    --conf "spark.databricks.delta.catalog.update.enabled=true"
 ```
+
+**Note:** Replace `server` by `localhost` when working with the delta container within the client compose.
 
 ## List schemas in catalog unity
 
@@ -69,21 +72,28 @@ spark.sql("SHOW TABLES IN unity.default").show()
 
 ```python
 # Show the location of the delta table on disk
-spark.sql("DESCRIBE DETAIL unity.default.user_countries").show(truncate=False)
+spark.sql("DESCRIBE DETAIL unity.default.numbers").show(truncate=False)
 ```
 
 ## Show metadata location for unity.default.numbers
 
 ```python
 # Show where the metadata for the delta table is stored
-spark.sql("DESCRIBE EXTENDED unity.default.user_countries").show(truncate=False)
+spark.sql("DESCRIBE EXTENDED unity.default.numbers").show(truncate=False)
 ```
 
 ## Show records in unity.default.marksheet
 
 ```python
 # Show all records from the marksheet table
-spark.sql("SELECT * FROM unity.default.user_countries").show()
+spark.sql("SELECT * FROM unity.default.numbers").show()
+```
+
+## Create a new table called employees in unity.default
+
+```python
+# Drop the employees table if it exists
+spark.sql("DROP TABLE IF EXISTS unity.default.employees")
 ```
 
 ## Create a new table called employees in unity.default
@@ -124,10 +134,10 @@ INSERT INTO unity.default.employees VALUES
 # Show all records from the employees table
 spark.sql("SELECT * FROM unity.default.employees").show()
 ```
-## Read as a Spark-DataFrame
+## Read as a Spark-DataFrame.
 
 ```python
-# Read table and write to MinIO as Parquet
+# Read table and write as Delta format
 df = spark.table("unity.default.employees")
-df.show(truncate=False)
+df.show()
 ```

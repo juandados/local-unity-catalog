@@ -1,0 +1,23 @@
+name: unitycatalog_client
+
+services:
+  delta:
+    build:
+      context: delta
+      dockerfile: Dockerfile
+    network_mode: host
+    volumes:
+      - type: bind
+        source: unitycatalog/etc/conf
+        target: /opt/delta/etc/conf
+      - type: bind
+        source: data_warehouse
+        target: /home/unitycatalog/etc/data/external
+    command: tail -f /dev/null
+    
+    
+volumes:
+  # Persist docker volume across container restarts
+    unitycatalog:
+    minio_data:
+    mlflow_data:

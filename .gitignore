@@ -162,12 +162,11 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
-# Notebooks y carpeta de notebooks
-*.ipynb
+# Notebooks and notebook folder
 *.ipynb_checkpoints/
 notebooks/
 
-# Configuraciones y archivos basura - Trabajo con Docker
+# Configuration and trash files - Docker workspace
 # .devcontainer/
 .dockerignore
 .Trash-1000/
@@ -181,3 +180,7 @@ unitycatalog/
 # GitHub copilot
 .github/copilot/
 .github/copilot-instructions.md
+
+# Data directories
+data_warehouse
+delta-docker
