@@ -7,14 +7,14 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-      - "4040:4040"  # For SparkUI
-      - "8888:8888"  # For JupyterHub
+      - "4040:4040"
+      - "8888:8888"
     volumes:
       - type: bind
         source: unitycatalog/etc/conf
         target: /opt/delta/etc/conf
       - type: bind
-        source: ${DATA_WAREHOUSE_PATH:-/home/andres-campos/github_private/local-unity-catalog/data_warehouse}
+        source: data_warehouse
         target: /home/unitycatalog/etc/data/external
       - type: bind
         source: ./notebooks
@@ -45,7 +45,7 @@ services:
         source: unitycatalog
         target: /home/unitycatalog
       - type: bind
-        source: ${DATA_WAREHOUSE_PATH:-/home/andres-campos/github_private/local-unity-catalog/data_warehouse}
+        source: data_warehouse
         target: /home/unitycatalog/etc/data/external
   
   ui:

@@ -17,6 +17,9 @@ This project demonstrates how to use Unity Catalog locally with Delta Lake and P
 
    # Clone the forked Unity Catalog repository  
    git clone https://github.com/juandados/unitycatalog.git
+
+   # Clone the forked Delta Lake repository
+   git clone https://github.com/juandados/delta.git
    ```
 
 2. **Start the services:**

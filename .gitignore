@@ -162,13 +162,13 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
-# Notebooks and notebook folder
+# notebooks folder
 *.ipynb_checkpoints/
 *.Trash-0
 notebooks/README.md
 notebooks/download
 
-# Configuration and trash files - Docker workspace
+# Configuration and trash files - Docker workspace-VScode
 # .devcontainer/
 .dockerignore
 .Trash-1000/
