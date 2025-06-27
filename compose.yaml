@@ -1,12 +1,14 @@
 name: unitycatalog
 
 services:
-  delta:
+  pyspark:
     build:
-      context: delta
+      context: pyspark
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+      - "4040:4040"
+      - "8888:8888"
     volumes:
       - type: bind
         source: unitycatalog/etc/conf
@@ -14,11 +16,21 @@ services:
       - type: bind
         source: data_warehouse
         target: /home/unitycatalog/etc/data/external
-      - type: volume
-        source: unitycatalog
-        target: /home/unitycatalog
-    command: tail -f /dev/null
-    
+      - type: bind
+        source: ./notebooks
+        target: /tmp/notebooks
+      - type: bind
+        source: ./README.md
+        target: /tmp/notebooks/README.md
+    command: >
+      jupyter lab 
+      --ip=0.0.0.0 
+      --port=8888 
+      --no-browser 
+      --NotebookApp.token=''
+      --NotebookApp.password=''
+      --notebook-dir=/tmp/notebooks
+      --allow-root
   server:
     build:
       context: unitycatalog
@@ -35,6 +47,7 @@ services:
       - type: bind
         source: data_warehouse
         target: /home/unitycatalog/etc/data/external
+  
   ui:
     build:
       context: unitycatalog/ui/
@@ -43,19 +56,6 @@ services:
       - "3000:3000"
     depends_on:
       - server
-
-  minio:
-    image: minio/minio:latest
-    container_name: minio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - minio_data:/data
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    command: server /data --console-address ":9001"
 
   mlflow:
     image: ghcr.io/mlflow/mlflow:latest
@@ -73,5 +73,4 @@ services:
 volumes:
   # Persist docker volume across container restarts
   unitycatalog:
-  minio_data:
   mlflow_data:
