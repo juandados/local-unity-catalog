@@ -34,6 +34,7 @@ This project demonstrates how to use Unity Catalog locally with Delta Lake and P
 ---
 
 # PySpark Examples
+
 **Note** You should have spark 3.5.3 or above to support unitycatalog features.
 
 ## Start a new spark session
@@ -137,7 +138,6 @@ spark.sql("SELECT * FROM unity.default.employees").show()
 ## Read as a Spark-DataFrame.
 
 ```python
-# Read table and write as Delta format
 df = spark.table("unity.default.employees")
 df.show()
 ```
