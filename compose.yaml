@@ -9,6 +9,10 @@ services:
       - "8000:8000"
       - "4040:4040"
       - "8888:8888"
+    environment:
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON=jupyter
+      - PYSPARK_DRIVER_PYTHON_OPTS=lab
     volumes:
       - type: bind
         source: unitycatalog/etc/conf
@@ -22,6 +26,13 @@ services:
       - type: bind
         source: ./README.md
         target: /tmp/notebooks/README.md
+      - type: bind
+        source: ./pyspark/startup_spark.py
+        target: /opt/startup_spark.py
+      - type: bind
+        source: ./pyspark/entrypoint.sh
+        target: /opt/entrypoint.sh
+    entrypoint: ["/bin/bash", "/opt/entrypoint.sh"]
     command: >
       jupyter lab 
       --ip=0.0.0.0 
