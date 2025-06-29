@@ -3,8 +3,6 @@
 IPython startup script to automatically initialize Spark with Unity Catalog configuration.
 This script creates a pre-configured Spark session available as 'spark' in all notebooks.
 """
-
-import os
 from pyspark.sql import SparkSession
 
 def create_spark_session():

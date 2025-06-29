@@ -42,6 +42,7 @@ services:
       --NotebookApp.password=''
       --notebook-dir=/tmp/notebooks
       --allow-root
+  
   server:
     build:
       context: unitycatalog
