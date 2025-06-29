@@ -13,6 +13,8 @@ services:
       - PYSPARK_PYTHON=python3
       - PYSPARK_DRIVER_PYTHON=jupyter
       - PYSPARK_DRIVER_PYTHON_OPTS=lab
+      - UNITY_CATALOG_URI=${UNITY_CATALOG_URI:-https://my-uc-server:8080}
+      - UNITY_CATALOG_TOKEN=${UNITY_CATALOG_TOKEN}
     volumes:
       - type: bind
         source: unitycatalog/etc/conf
@@ -83,7 +85,7 @@ services:
     command: mlflow server --backend-store-uri /mlflow/mlruns --default-artifact-root /mlflow/mlruns --host 0.0.0.0
 
   filebrowser:
-    image: filebrowser/filebrowser:latest
+    image: filebrowser/filebrowser:v2.33.10
     container_name: filebrowser
     ports:
       - "8082:80"

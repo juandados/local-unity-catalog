@@ -28,11 +28,6 @@ c = get_config()
 c.IPKernelApp.exec_lines = [
     'print("🔄 Loading Unity Catalog Spark session...")'
 ]
-
-# Set environment variables for better Spark integration
-import os
-os.environ['PYSPARK_DRIVER_PYTHON'] = 'jupyter'
-os.environ['PYSPARK_DRIVER_PYTHON_OPTS'] = 'lab'
 EOF
 
 echo "📋 Jupyter configuration created"
@@ -41,7 +36,7 @@ echo "📋 Jupyter configuration created"
 echo ""
 echo "🎯 Starting Jupyter Lab with Unity Catalog integration..."
 echo "📖 The 'spark' object will be automatically available in all notebooks"
-echo "🌐 Unity Catalog server: http://server:8080"
+echo "🌐 Unity Catalog server: ${UNITY_CATALOG_URI:-http://server:8080}"
 echo "📊 Spark UI will be available at: http://localhost:4040"
 echo ""
 
