@@ -9,6 +9,12 @@ services:
       - "8000:8000"
       - "4040:4040"
       - "8888:8888"
+    environment:
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON=jupyter
+      - PYSPARK_DRIVER_PYTHON_OPTS=lab
+      - UNITY_CATALOG_URI=https://server:8080
+      - UNITY_CATALOG_TOKEN=""
     volumes:
       - type: bind
         source: unitycatalog/etc/conf
@@ -22,6 +28,13 @@ services:
       - type: bind
         source: ./README.md
         target: /tmp/notebooks/README.md
+      - type: bind
+        source: ./pyspark/startup_spark.py
+        target: /opt/startup_spark.py
+      - type: bind
+        source: ./pyspark/entrypoint.sh
+        target: /opt/entrypoint.sh
+    entrypoint: ["/bin/bash", "/opt/entrypoint.sh"]
     command: >
       jupyter lab 
       --ip=0.0.0.0 
@@ -31,6 +44,7 @@ services:
       --NotebookApp.password=''
       --notebook-dir=/tmp/notebooks
       --allow-root
+  
   server:
     build:
       context: unitycatalog
@@ -69,6 +83,22 @@ services:
     volumes:
       - mlflow_data:/mlflow/mlruns
     command: mlflow server --backend-store-uri /mlflow/mlruns --default-artifact-root /mlflow/mlruns --host 0.0.0.0
+
+  filebrowser:
+    image: filebrowser/filebrowser:v2.33.10
+    container_name: filebrowser
+    ports:
+      - "8082:80"
+    volumes:
+      - type: bind
+        source: ./data_warehouse
+        target: /srv/data_warehouse
+      - type: bind
+        source: ./delta
+        target: /srv/delta
+      - type: bind
+        source: ./notebooks/downloads
+        target: /srv/downloads
 
 volumes:
   # Persist docker volume across container restarts
