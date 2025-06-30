@@ -13,8 +13,8 @@ services:
       - PYSPARK_PYTHON=python3
       - PYSPARK_DRIVER_PYTHON=jupyter
       - PYSPARK_DRIVER_PYTHON_OPTS=lab
-      - UNITY_CATALOG_URI=${UNITY_CATALOG_URI:-https://my-uc-server:8080}
-      - UNITY_CATALOG_TOKEN=${UNITY_CATALOG_TOKEN}
+      - UNITY_CATALOG_URI=https://server:8080
+      - UNITY_CATALOG_TOKEN=""
     volumes:
       - type: bind
         source: unitycatalog/etc/conf
@@ -96,6 +96,9 @@ services:
       - type: bind
         source: ./delta
         target: /srv/delta
+      - type: bind
+        source: ./notebooks/downloads
+        target: /srv/downloads
 
 volumes:
   # Persist docker volume across container restarts

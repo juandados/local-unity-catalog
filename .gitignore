@@ -165,7 +165,6 @@ cython_debug/
 
 # notebooks folder
 *.ipynb_checkpoints/
-*ipynb
 *.Trash-0
 notebooks/README.md
 notebooks/download

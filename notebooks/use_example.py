@@ -1,3 +1,16 @@
+"""
+Unity Catalog and Delta Lake Examples
+
+This script demonstrates basic operations with Unity Catalog and Delta Lake:
+- Querying catalogs and tables
+- Inserting data into tables
+- Using time travel features to access specific versions
+- Exporting data to CSV and Parquet formats
+
+Requirements:
+- Configured Spark environment with Unity Catalog access
+- 'employees' table in unity.default schema
+"""
 # Display all available catalogs in Unity Catalog
 spark.sql("SHOW CATALOGS").show()
 # Show tables in the default schema of unity catalog
@@ -8,9 +21,6 @@ try:
     spark.sql("DESCRIBE EXTENDED unity.default.employees").show(truncate=False)
     # Show a preview of the data in the table
     spark.sql("SELECT * FROM unity.default.employees").show()
-    # Load employees table into a Spark DataFrame
-    df = spark.table("unity.default.employees")
-    df.show()
 except Exception as e:
     print(f"Error describing table: {e}")
     print("Please read the README.md and/or run explore_jupyter_session.py to configure your environment.")
