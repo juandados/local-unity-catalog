@@ -48,7 +48,7 @@ spark.sql("SELECT * FROM unity.default.employees").show()
     .show(truncate=False)
 )
 
-# Version 1 - Firts read in table
+# Version 1 - First read in table
 (
     spark
     .read
